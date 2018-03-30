@@ -5,7 +5,6 @@
 #include<io.h>    //_setmode()
 #include<malloc.h>
 
-
 struct SINHVIEN
 {
 	wchar_t MSSV[10];
@@ -79,11 +78,44 @@ void LayThongtinSV(FILE* fin, SINHVIEN* &SV, long count)
 	}
 }
 
+int StrlenWchar(wchar_t* str)
+{
+	int i = 0;
+	while (str[i] != '\0')
+		i++;
+	return i;
+}
+
+wchar_t* DatTenFile(wchar_t* MSSV)
+{
+	wchar_t str[] = L".HTML";
+	int len1 = StrlenWchar(MSSV);
+	int len2 = StrlenWchar(str);
+	int len = len1 + len2;
+	wchar_t *FileName = (wchar_t*)calloc(len * sizeof(wchar_t), sizeof(wchar_t));
+	if (FileName != NULL)
+	{
+		for (int i = 0, j = 0; i < len; ++i)
+		{
+			if (i < len1)
+			{
+				FileName[i] = MSSV[i];
+			}
+			else
+			{
+				FileName[i] = str[j];
+				j++;
+			}
+		}
+	}
+	return FileName;
+}
+
 void main()
 {
 	_setmode(_fileno(stdout), _O_U16TEXT); //needed for output
 	_setmode(_fileno(stdin), _O_U16TEXT); //needed for input
-
+										  //đọc thông tin từ file CSV
 	FILE* fin = _wfopen(L"thongtinsv.CSV", L"rt+, ccs=UTF-8");
 	if (!fin)
 	{
@@ -99,14 +131,22 @@ void main()
 	if (SV != NULL)
 	{
 		LayThongtinSV(fin, SV, count);
-		for (int i = 0; i < count; i++)
-		{
-			wprintf(L"%ls", (SV + i)->MoTa);
-			wprintf(L"%ls\n", (SV + i)->SoThich);
-		}
 	}
+	//ghi lên file HTML
+	for (int i = 0; i < 1; i++)
+	{
+		wchar_t* FileName = DatTenFile((SV + i)->MSSV);
+		if (FileName == NULL) break;
+		FILE* fout = _wfopen(FileName, L"w, ccs=UTF-8");
+		if (!fout)
+		{
+			wprintf(L"không thể mở file %ls\n", FileName);
+		}
+		else {
 
-
+		}
+		fclose(fout);
+	}
 
 	if (SV != NULL) free(SV);
 	fclose(fin);
