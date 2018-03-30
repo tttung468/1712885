@@ -4,8 +4,9 @@
 #include<fcntl.h> //_O_U16TEXT
 #include<io.h>    //_setmode()
 #include<malloc.h>
+#define MaxN 2048
 
-struct SINHVIEN
+typedef struct
 {
 	wchar_t MSSV[10];
 	wchar_t HoTen[30];
@@ -16,13 +17,13 @@ struct SINHVIEN
 	wchar_t HinhAnh[30];
 	wchar_t MoTa[1000];
 	wchar_t SoThich[1000];
-};
+}SINHVIEN;
 
 long countLines(FILE* fin)
 {
 	long count = 0;
-	wchar_t line[2048];
-	while (fgetws(line, 2048, fin) != NULL)
+	wchar_t line[MaxN];
+	while (fgetws(line, MaxN, fin) != NULL)
 	{
 		count++;
 	}
@@ -80,35 +81,51 @@ void LayThongtinSV(FILE* fin, SINHVIEN* &SV, long count)
 
 int StrlenWchar(wchar_t* str)
 {
-	int i = 0;
-	while (str[i] != '\0')
-		i++;
-	return i;
+	wchar_t* p = str;
+	while (*p++);
+	return (p - str - 1);
 }
 
 wchar_t* DatTenFile(wchar_t* MSSV)
 {
-	wchar_t str[] = L".HTML";
+	wchar_t str2[] = L".html";
+	wchar_t str0[] = L"WEBSITE\\";
 	int len1 = StrlenWchar(MSSV);
-	int len2 = StrlenWchar(str);
-	int len = len1 + len2;
-	wchar_t *FileName = (wchar_t*)calloc(len * sizeof(wchar_t), sizeof(wchar_t));
+	int len0 = StrlenWchar(str0);
+	int len2 = StrlenWchar(str2);
+	int len = len0 + len1 + len2;
+	wchar_t *FileName = (wchar_t*)calloc(len, sizeof(wchar_t));
 	if (FileName != NULL)
 	{
-		for (int i = 0, j = 0; i < len; ++i)
+		for (int i = 0, j = 0, k = 0; i <= len; ++i)
 		{
-			if (i < len1)
+			if (i < len0)					//ghép chuỗi WEBSITE
 			{
-				FileName[i] = MSSV[i];
+				FileName[i] = str0[i];
+			}
+			else if (i < len0 + len1)				//ghép chuỗi MSSV
+			{
+				FileName[i] = MSSV[j];
+				j++;
 			}
 			else
 			{
-				FileName[i] = str[j];
-				j++;
+				FileName[i] = str2[k];		//ghép chuỗi .HTML
+				k++;
 			}
 		}
 	}
 	return FileName;
+}
+
+void GhiFile(FILE* fileMauHTML, FILE* fileOut)
+{
+	while (!feof(fileMauHTML))
+	{
+		wchar_t str[MaxN];
+		fgetws(str, MaxN, fileMauHTML);
+		fputws(str, fileOut);
+	}
 }
 
 void main()
@@ -116,7 +133,7 @@ void main()
 	_setmode(_fileno(stdout), _O_U16TEXT); //needed for output
 	_setmode(_fileno(stdin), _O_U16TEXT); //needed for input
 										  //đọc thông tin từ file CSV
-	FILE* fin = _wfopen(L"thongtinsv.CSV", L"rt+, ccs=UTF-8");
+	FILE* fin = _wfopen(L"thongtinsv.CSV", L"r, ccs=UTF-8");
 	if (!fin)
 	{
 		wprintf(L"Không mở được file thongtinsv.CSV");
@@ -124,29 +141,42 @@ void main()
 		_getch();
 		return;
 	}
-
-	long count = countLines(fin);
+	long count = countLines(fin);		//lấy số lượng sinh viên trong file
 	rewind(fin);
-	SINHVIEN* SV = (SINHVIEN*)calloc(count * sizeof(SINHVIEN), sizeof(SINHVIEN));
+	SINHVIEN* SV = (SINHVIEN*)calloc(count, sizeof(SINHVIEN));
 	if (SV != NULL)
 	{
 		LayThongtinSV(fin, SV, count);
 	}
-	//ghi lên file HTML
+	//mở file HTML mẫu và xuất ra file HTML mới
 	for (int i = 0; i < 1; i++)
 	{
-		wchar_t* FileName = DatTenFile((SV + i)->MSSV);
-		if (FileName == NULL) break;
-		FILE* fout = _wfopen(FileName, L"w, ccs=UTF-8");
-		if (!fout)
+		FILE* fileMauHTML = _wfopen(L"fileMauHTML.html", L"r, ccs=UTF-8");			//file HTML mẫu
+		if (!fileMauHTML)
 		{
-			wprintf(L"không thể mở file %ls\n", FileName);
+			wprintf(L"Không mở được file fileMauHTML.html");
+			fclose(fileMauHTML);
+			_getch();
+			return;
 		}
-		else {
+		wchar_t* NameFout = DatTenFile((SV + i)->MSSV);
+		if (NameFout == NULL) break;
+		FILE* fileOut = _wfopen(NameFout, L"w, ccs=UTF-8");						//file HTML xuất ra
+		if (!fileOut)
+		{
+			wprintf(L"không thể mở file %ls", NameFout);
+			fclose(fileOut);
+			_getch();
+			return;
+		}
+		GhiFile(fileMauHTML, fileOut);
 
-		}
-		fclose(fout);
+
+		fclose(fileOut);
+		fclose(fileMauHTML);
 	}
+
+
 
 	if (SV != NULL) free(SV);
 	fclose(fin);
