@@ -7,6 +7,7 @@
 #include<string.h>
 #define MaxN 2048
 
+
 typedef struct
 {
 	wchar_t MSSV[11];
@@ -22,14 +23,14 @@ typedef struct
 
 typedef struct
 {
-	wchar_t* Title = L"<title>";
+	wchar_t* Title1 = L"<title>";
 	wchar_t* NameMSSV = L"\"Personal_FullName\">";
 	wchar_t* Khoa = L"\"Personal_Department\">";
 	wchar_t* Email = L"\"Personal_Phone\">";
-	wchar_t* ThongTin = L"Thông tin cá nhân";
-	wchar_t* SoThich = L"Sở thích";
+	wchar_t* HinhAnh = L"Personal_HinhcanhanKhung";
+	wchar_t* ThongTin = L"TextInListThongTin";
+	wchar_t* SoThich = L"TextInListSoThich";
 	wchar_t* Mota = L"Description\">";
-	wchar_t* List = L"\"TextInList\">";
 }TUKHOA;
 
 long countLines(FILE* fin)
@@ -124,42 +125,121 @@ wchar_t* DatTenFile(wchar_t* MSSV)
 	return FileName;
 }
 
-void ChenChuoiCon(FILE* fileOut, long VtriChen, wchar_t* ChuoiChen)
+wchar_t* LayChuoiCon(wchar_t* ChuoiCha, int len)
 {
-
-}
-
-long TimVtriChuoiCon(wchar_t* Str, wchar_t* StrCon)
-{
-	long i = 0;
-	while (1)
+	wchar_t* str = (wchar_t*)calloc(len + 1, sizeof(wchar_t));
+	for (int i = 0; i < len; i++)
 	{
-		if (Str[i] == StrCon[0])	return i;
-		i++;
+		str[i] = ChuoiCha[i];
 	}
+	str[len] = '\0';
+	return str;
 }
 
-void GhiFile(FILE* fileMauHTML, FILE* fileOut)
+int TimVtriChuoiCon(wchar_t* ChuoiCha, wchar_t* ChuoiCon)
 {
-	TUKHOA TKhoa;
+	int lenCha = wcslen(ChuoiCha);
+	int lenCon = wcslen(ChuoiCon);
+	for (int i = 0; i < lenCha; i++)
+	{
+		wchar_t* str = LayChuoiCon(ChuoiCha + i, lenCon);
+		if (wcscmp(str, ChuoiCon) == 0)
+			return i + lenCon;
+	}
+	return -1;
+}
+
+void ChenChuoiCon(wchar_t* ChuoiCha, wchar_t* ChuoiChen, int VtriChen)
+{
+	int lenCha = wcslen(ChuoiCha);
+	int lenChen = wcslen(ChuoiChen);
+	wchar_t* temp = (wchar_t*)calloc(lenCha - VtriChen + 1, sizeof(wchar_t));
+	wcscpy(temp, ChuoiCha + VtriChen);
+	wcscpy(ChuoiCha + VtriChen, ChuoiChen);
+	wcscpy(ChuoiCha + VtriChen + lenChen, temp);
+	delete[] temp;
+}
+
+void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
+{
+	TUKHOA TuKhoa;
+	wchar_t* str = (wchar_t*)calloc(MaxN, sizeof(wchar_t));
+	int vitri;
 	while (!feof(fileMauHTML))
 	{
-		wchar_t str[MaxN];
-		long DauDong = ftell(fileOut);					//vị trí con trỏ fileOut ở đầu dòng
-		long VtriChen;
 		fgetws(str, MaxN, fileMauHTML);
-		fputws(str, fileOut);
-		long CuoiDong = ftell(fileOut);					//vị trí con trỏ fileOut ở cuối dòng
-		if (wcsstr(str, TKhoa.Title))
+		if (wcsstr(str, TuKhoa.Title1))
 		{
-			VtriChen = DauDong + TimVtriChuoiCon(str, TKhoa.Title);
-			wprintf(L"0x%d\n", DauDong);
-			wprintf(L"0x%d\n", CuoiDong);
-			wprintf(L"0x%d\n", VtriChen);
-			wprintf(L"0x%d\n", str);
-			wprintf(L"0x%d\n", wcsstr(str, TKhoa.Title));
+			vitri = TimVtriChuoiCon(str, TuKhoa.Title1);
+			ChenChuoiCon(str, L"HCMUS - ", vitri);
+			vitri = TimVtriChuoiCon(str, L"HCMUS - ");
+			ChenChuoiCon(str, SV.HoTen, vitri);
 		}
+		else if (wcsstr(str, TuKhoa.NameMSSV))
+		{
+			vitri = TimVtriChuoiCon(str, TuKhoa.NameMSSV);
+			ChenChuoiCon(str, SV.HoTen, vitri);
+			vitri = TimVtriChuoiCon(str, SV.HoTen);
+			ChenChuoiCon(str, L" - ", vitri);
+			vitri = TimVtriChuoiCon(str, L" - ");
+			ChenChuoiCon(str, SV.MSSV, vitri);
+		}
+		else if (wcsstr(str, TuKhoa.Khoa))
+		{
+			vitri = TimVtriChuoiCon(str, TuKhoa.Khoa);
+			ChenChuoiCon(str, L" Khoa ", vitri);
+			vitri = TimVtriChuoiCon(str, L" Khoa ");
+			ChenChuoiCon(str, SV.Khoa, vitri);
+		}
+		else if (wcsstr(str, TuKhoa.Email))
+		{
+			vitri = TimVtriChuoiCon(str, TuKhoa.Email);
+			ChenChuoiCon(str, L"Email: ", vitri);
+			vitri = TimVtriChuoiCon(str, L"Email: ");
+			ChenChuoiCon(str, SV.Email, vitri);
+		}
+		else if (wcsstr(str, TuKhoa.HinhAnh))
+		{
+			fputws(str, fileOut);
+			fgetws(str, MaxN, fileMauHTML);
+			vitri = TimVtriChuoiCon(str, L"<img src=\"");
+			ChenChuoiCon(str, SV.HinhAnh, vitri);
+		}
+		else if (wcsstr(str, TuKhoa.ThongTin))
+		{
+			fputws(str, fileOut);
+			fgetws(str, MaxN, fileMauHTML);
+			vitri = TimVtriChuoiCon(str, L"Họ và tên: ");
+			ChenChuoiCon(str, SV.HoTen, vitri);
+			fputws(str, fileOut);
+			fgetws(str, MaxN, fileMauHTML);
+			vitri = TimVtriChuoiCon(str, L"MSSV: ");
+			ChenChuoiCon(str, SV.MSSV, vitri);
+			fputws(str, fileOut);
+			fgetws(str, MaxN, fileMauHTML);
+			vitri = TimVtriChuoiCon(str, L"Sinh viên khoa ");
+			ChenChuoiCon(str, SV.Khoa, vitri);
+			fputws(str, fileOut);
+			fgetws(str, MaxN, fileMauHTML);
+			vitri = TimVtriChuoiCon(str, L"Ngày sinh: ");
+			ChenChuoiCon(str, SV.NgaySinh, vitri);
+			fputws(str, fileOut);
+			fgetws(str, MaxN, fileMauHTML);
+			vitri = TimVtriChuoiCon(str, L"Email: ");
+			ChenChuoiCon(str, SV.Email, vitri);
+		}
+		else if (wcsstr(str, TuKhoa.Mota))
+		{
+			vitri = TimVtriChuoiCon(str, TuKhoa.Mota);
+			ChenChuoiCon(str, SV.MoTa, vitri);
+		}
+		else if (wcsstr(str, TuKhoa.SoThich))
+		{
+
+		}
+		fputws(str, fileOut);
 	}
+	delete[] str;
 }
 
 void main()
@@ -203,15 +283,12 @@ void main()
 			_getch();
 			return;
 		}
-		GhiFile(fileMauHTML, fileOut);
+		GhiFile(fileMauHTML, fileOut, SV[i]);
 
 
 		fclose(fileOut);
 		fclose(fileMauHTML);
 	}
-
-
-
 	if (SV != NULL) free(SV);
 	fclose(fin);
 	_getch();
