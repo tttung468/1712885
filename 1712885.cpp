@@ -375,13 +375,9 @@ void main()
 			return;
 		}
 		GhiFile(fileMauHTML, fileOut, SV[i]);
-
-
 		fclose(fileOut);
 		fclose(fileMauHTML);
 	}
-
-
 	if (SV != NULL) free(SV);
 	fclose(fin);
 }
