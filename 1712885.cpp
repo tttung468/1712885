@@ -55,7 +55,7 @@ void TachChuoi(FILE *fin, SINHVIEN* &SV, wchar_t* thongtin, wchar_t KiTuDung)	//
 		if (ch == KiTuDung)
 		{
 			int k = j - 1;
-			while (thongtin[k] == ',' && KiTuDung == '\n')		//nếu không có sở thích thì lấy kí tự ',' trong chuỗi
+			while (thongtin[k] == ',' && KiTuDung == '\n')		//nếu không có sở thích thì lấy kí tự ',' trong chuỗi tạo thành chuỗi rỗng
 			{
 				thongtin[k] = '\0';
 				k--;
@@ -181,7 +181,7 @@ int TimVtriKituPhanCachSoThich(wchar_t* ChuoiCha, wchar_t KtuPhancach)
 	}
 }
 
-void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
+void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN* SV)
 {
 	TUKHOA TuKhoa;
 	wchar_t* str = (wchar_t*)calloc(MaxN, sizeof(wchar_t));
@@ -194,37 +194,37 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
 			vitri = TimVtriChuoiCon(str, TuKhoa.Title1);
 			ChenChuoiCon(str, L"HCMUS - ", vitri);
 			vitri = TimVtriChuoiCon(str, L"HCMUS - ");
-			ChenChuoiCon(str, SV.HoTen, vitri);
+			ChenChuoiCon(str, SV->HoTen, vitri);
 		}
 		else if (wcsstr(str, TuKhoa.NameMSSV))
 		{
 			vitri = TimVtriChuoiCon(str, TuKhoa.NameMSSV);
-			ChenChuoiCon(str, SV.HoTen, vitri);
-			vitri = TimVtriChuoiCon(str, SV.HoTen);
+			ChenChuoiCon(str, SV->HoTen, vitri);
+			vitri = TimVtriChuoiCon(str, SV->HoTen);
 			ChenChuoiCon(str, L" - ", vitri);
 			vitri = TimVtriChuoiCon(str, L" - ");
-			ChenChuoiCon(str, SV.MSSV, vitri);
+			ChenChuoiCon(str, SV->MSSV, vitri);
 		}
 		else if (wcsstr(str, TuKhoa.Khoa))
 		{
 			vitri = TimVtriChuoiCon(str, TuKhoa.Khoa);
 			ChenChuoiCon(str, L" Khoa ", vitri);
 			vitri = TimVtriChuoiCon(str, L" Khoa ");
-			ChenChuoiCon(str, SV.Khoa, vitri);
+			ChenChuoiCon(str, SV->Khoa, vitri);
 		}
 		else if (wcsstr(str, TuKhoa.Email))
 		{
 			vitri = TimVtriChuoiCon(str, TuKhoa.Email);
 			ChenChuoiCon(str, L"Email: ", vitri);
 			vitri = TimVtriChuoiCon(str, L"Email: ");
-			ChenChuoiCon(str, SV.Email, vitri);
+			ChenChuoiCon(str, SV->Email, vitri);
 		}
 		else if (wcsstr(str, TuKhoa.HinhAnh))
 		{
 			fputws(str, fileOut);
 			fgetws(str, MaxN, fileMauHTML);
 			vitri = TimVtriChuoiCon(str, L"<img src=\"");
-			ChenChuoiCon(str, SV.HinhAnh, vitri);
+			ChenChuoiCon(str, SV->HinhAnh, vitri);
 		}
 		else if (wcsstr(str, TuKhoa.ThongTin))
 		{
@@ -237,23 +237,23 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
 					fputws(str, fileOut);
 					fgetws(str, MaxN, fileMauHTML);
 					vitri = TimVtriChuoiCon(str, L"Họ và tên: ");
-					ChenChuoiCon(str, SV.HoTen, vitri);
+					ChenChuoiCon(str, SV->HoTen, vitri);
 					fputws(str, fileOut);
 					fgetws(str, MaxN, fileMauHTML);
 					vitri = TimVtriChuoiCon(str, L"MSSV: ");
-					ChenChuoiCon(str, SV.MSSV, vitri);
+					ChenChuoiCon(str, SV->MSSV, vitri);
 					fputws(str, fileOut);
 					fgetws(str, MaxN, fileMauHTML);
 					vitri = TimVtriChuoiCon(str, L"Sinh viên khoa ");
-					ChenChuoiCon(str, SV.Khoa, vitri);
+					ChenChuoiCon(str, SV->Khoa, vitri);
 					fputws(str, fileOut);
 					fgetws(str, MaxN, fileMauHTML);
 					vitri = TimVtriChuoiCon(str, L"Ngày sinh: ");
-					ChenChuoiCon(str, SV.NgaySinh, vitri);
+					ChenChuoiCon(str, SV->NgaySinh, vitri);
 					fputws(str, fileOut);
 					fgetws(str, MaxN, fileMauHTML);
 					vitri = TimVtriChuoiCon(str, L"Email: ");
-					ChenChuoiCon(str, SV.Email, vitri);
+					ChenChuoiCon(str, SV->Email, vitri);
 					break;
 				}
 			}
@@ -261,7 +261,7 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
 		else if (wcsstr(str, TuKhoa.Mota))
 		{
 			vitri = TimVtriChuoiCon(str, TuKhoa.Mota);
-			ChenChuoiCon(str, SV.MoTa, vitri);
+			ChenChuoiCon(str, SV->MoTa, vitri);
 		}
 		else if (wcsstr(str, TuKhoa.SoThich))
 		{
@@ -274,7 +274,7 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
 			if (wcsstr(str, TuKhoa.TestList))
 			{
 				fputws(str, fileOut);
-				wchar_t* SoThich = SV.SoThich;
+				wchar_t* SoThich = SV->SoThich;
 				wchar_t* ChuoiCon = (wchar_t*)calloc(255, sizeof(wchar_t));		//lưu từng sở thích trong SV.SoThich
 				int VtriDauChuoi = 0;
 				while (1)														//xử lí từng sở thích trong trường SV.SoThich
@@ -333,11 +333,49 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN SV)
 	free(str);
 }
 
+void ThayDoiThongTin(SINHVIEN *SV)
+{
+	wprintf(L"Nhập lại khoa của sinh viên: ");
+	fgetws(SV->Khoa, 31, stdin);
+	SV->Khoa[wcslen(SV->Khoa) - 1] = L'\0';
+	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
+	wprintf(L"Nhập lại ngày sinh của sinh viên: ");
+	fgetws(SV->NgaySinh, 13, stdin);
+	SV->NgaySinh[wcslen(SV->NgaySinh) - 1] = L'\0';
+	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
+	wprintf(L"Nhập lại mô tả về sinh viên: ");
+	fgetws(SV->MoTa, 1001, stdin);
+	SV->MoTa[wcslen(SV->MoTa) - 1] = L'\0';
+	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
+
+	FILE* fileMauHTML = _wfopen(L"fileMauHTML.html", L"r, ccs=UTF-8");			//file HTML mẫu
+	if (!fileMauHTML)
+	{
+		wprintf(L"Không mở được file fileMauHTML.html");
+		fclose(fileMauHTML);
+		_getch();
+		return;
+	}
+	wchar_t* NameFout = DatTenFile(SV->MSSV);
+	if (NameFout == NULL) return;
+	FILE* fileOut = _wfopen(NameFout, L"w, ccs=UTF-8");						//file HTML xuất ra
+	if (!fileOut)
+	{
+		wprintf(L"không thể mở file %ls", NameFout);
+		fclose(fileOut);
+		_getch();
+		return;
+	}
+	GhiFile(fileMauHTML, fileOut, SV);
+	fclose(fileOut);
+	fclose(fileMauHTML);
+}
+
 void main()
 {
 	_setmode(_fileno(stdout), _O_U16TEXT); //needed for output
-	_setmode(_fileno(stdin), _O_U16TEXT); //needed for input
-										  //đọc thông tin từ file CSV
+	_setmode(_fileno(stdin), _O_U16TEXT); //needed for inpu
+	//đọc thông tin từ file CSV
 	FILE* fin = _wfopen(L"thongtinsv.CSV", L"r, ccs=UTF-8");
 	if (!fin)
 	{
@@ -353,6 +391,7 @@ void main()
 	{
 		LayThongtinSV(fin, SV, count);
 	}
+	fclose(fin);
 	//mở file HTML mẫu và xuất ra file HTML mới
 	for (int i = 0; i < count; i++)
 	{
@@ -365,7 +404,7 @@ void main()
 			return;
 		}
 		wchar_t* NameFout = DatTenFile((SV + i)->MSSV);
-		if (NameFout == NULL) break;
+		if (NameFout == NULL) return;
 		FILE* fileOut = _wfopen(NameFout, L"w, ccs=UTF-8");						//file HTML xuất ra
 		if (!fileOut)
 		{
@@ -374,10 +413,26 @@ void main()
 			_getch();
 			return;
 		}
-		GhiFile(fileMauHTML, fileOut, SV[i]);
+		GhiFile(fileMauHTML, fileOut, SV + i);
 		fclose(fileOut);
 		fclose(fileMauHTML);
 	}
+	//Cấu hình thông tin cá nhân
+	int luachon;
+	wprintf(L"\nDanh sách các sinh viên :");
+	for (int i = 0; i < count; i++)
+	{
+		wprintf(L"\n%d) %ls", i + 1, (SV + i)->MSSV);
+	}
+	wprintf(L"\nBạn có muốn sửa thông tin về khoa, ngày sinh, mô tả của sinh viên nào không ?");
+	wprintf(L"\nHãy lựa chọn 1 sinh viên mà bạn muốn thay đổi bằng cách chọn thứ tự của sinh viên đó hoặc nhấn 0 để thoát chương trình: ");
+	wscanf_s(L"%d", &luachon);
+	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
+	if (luachon != 0)
+	{
+		luachon--;
+		ThayDoiThongTin(SV + luachon);
+	}
 	if (SV != NULL) free(SV);
-	fclose(fin);
+	_getch();
 }
