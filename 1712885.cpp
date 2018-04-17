@@ -7,7 +7,6 @@
 #include<string.h>
 #define MaxN 2048
 
-
 typedef struct
 {
 	wchar_t MSSV[11];
@@ -100,7 +99,7 @@ void LayThongtinSV(FILE* fin, SINHVIEN* &SV, long count)
 	}
 }
 
-wchar_t* DatTenFile(wchar_t* MSSV)
+wchar_t* DatTenFile(wchar_t* MSSV)		//lưu trang web đến WEBSITE\MSSV.htm
 {
 	wchar_t str2[] = L".html";
 	wchar_t str0[] = L"WEBSITE\\";
@@ -275,9 +274,9 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN* SV)
 			{
 				fputws(str, fileOut);
 				wchar_t* SoThich = SV->SoThich;
-				wchar_t* ChuoiCon = (wchar_t*)calloc(255, sizeof(wchar_t));		//lưu từng sở thích trong SV.SoThich
+				wchar_t* ChuoiCon = (wchar_t*)calloc(255, sizeof(wchar_t));		//lưu từng sở thích trong SV->SoThich
 				int VtriDauChuoi = 0;
-				while (1)														//xử lí từng sở thích trong trường SV.SoThich
+				while (1)														//xử lí từng sở thích trong trường SV->SoThich
 				{
 					if (SoThich[VtriDauChuoi] == '\"')							//sở thích được đặt trong ngoặc kép
 					{
@@ -300,7 +299,7 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN* SV)
 						}
 					}
 					else
-					{
+					{															//sở thích không đặt trong ngoặc kép
 						int i1 = TimVtriKituPhanCachSoThich(SoThich + VtriDauChuoi, SoThich[VtriDauChuoi]);
 						int i2 = TimVtriKituPhanCachSoThich(SoThich + VtriDauChuoi, ',');
 						if (SoThich[VtriDauChuoi] == '\0')
@@ -335,18 +334,34 @@ void GhiFile(FILE* fileMauHTML, FILE* fileOut, SINHVIEN* SV)
 
 void ThayDoiThongTin(SINHVIEN *SV)
 {
-	wprintf(L"Nhập lại khoa của sinh viên: ");
-	fgetws(SV->Khoa, 31, stdin);
-	SV->Khoa[wcslen(SV->Khoa) - 1] = L'\0';
+	int luachon = 0;
+	wprintf(L"Bạn có muốn thay đổi khoa mà sinh viên đang học ?(nhấn phím 1 để sửa hoặc phím 0 để giữ nguyên) : ");
+	wscanf_s(L"%d", &luachon);
 	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
-	wprintf(L"Nhập lại ngày sinh của sinh viên: ");
-	fgetws(SV->NgaySinh, 13, stdin);
-	SV->NgaySinh[wcslen(SV->NgaySinh) - 1] = L'\0';
+	if (luachon == 1)
+	{
+		wprintf(L"Nhâp lại khoa của sinh viên :");
+		fgetws(SV->Khoa, 31, stdin);
+		SV->Khoa[wcslen(SV->Khoa) - 1] = L'\0';
+	}
+	wprintf(L"Bạn có muốn thay đổi ngày sinh của sinh viên ?(nhấn phím 1 để sửa hoặc phím 0 để giữ nguyên) : ");
+	wscanf_s(L"%d", &luachon);
 	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
-	wprintf(L"Nhập lại mô tả về sinh viên: ");
-	fgetws(SV->MoTa, 1001, stdin);
-	SV->MoTa[wcslen(SV->MoTa) - 1] = L'\0';
+	if (luachon == 1)
+	{
+		wprintf(L"Nhập lại ngày sinh của sinh viên: ");
+		fgetws(SV->NgaySinh, 13, stdin);
+		SV->NgaySinh[wcslen(SV->NgaySinh) - 1] = L'\0';
+	}
+	wprintf(L"Bạn có muốn thay đổi mô tả về sinh viên ?(nhấn phím 1 để sửa hoặc phím 0 để giữ nguyên) : ");
+	wscanf_s(L"%d", &luachon);
 	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
+	if (luachon == 1)
+	{
+		wprintf(L"Nhập lại mô tả về sinh viên: ");
+		fgetws(SV->MoTa, 1001, stdin);
+		SV->MoTa[wcslen(SV->MoTa) - 1] = L'\0';
+	}
 
 	FILE* fileMauHTML = _wfopen(L"fileMauHTML.html", L"r, ccs=UTF-8");			//file HTML mẫu
 	if (!fileMauHTML)
@@ -424,7 +439,8 @@ void main()
 	{
 		wprintf(L"\n%d) %ls", i + 1, (SV + i)->MSSV);
 	}
-	wprintf(L"\nBạn có muốn sửa thông tin về khoa, ngày sinh, mô tả của sinh viên nào không ?");
+	wprintf(L"\n\nThông tin của các sinh viên trên đây đã được xuất ra trang web.");
+	wprintf(L"\nBạn có muốn sửa thông tin của sinh viên nào không ?");
 	wprintf(L"\nHãy lựa chọn 1 sinh viên mà bạn muốn thay đổi bằng cách chọn thứ tự của sinh viên đó hoặc nhấn 0 để thoát chương trình: ");
 	wscanf_s(L"%d", &luachon);
 	getwc(stdin); //comment out this line if fgetws did read the newline character from stdin
@@ -433,6 +449,7 @@ void main()
 		luachon--;
 		ThayDoiThongTin(SV + luachon);
 	}
+	wprintf(L"\nThông tin của sinh viên đã được sửa đổi");
 	if (SV != NULL) free(SV);
 	_getch();
 }
