@@ -449,7 +449,7 @@ void main()
 		luachon--;
 		ThayDoiThongTin(SV + luachon);
 	}
-	wprintf(L"\nThông tin của sinh viên đã được sửa đổi");
+	wprintf(L"\nChương trình đã hoàn tất. Mời bạn xem trang web của các sinh viên");
 	if (SV != NULL) free(SV);
 	_getch();
 }
